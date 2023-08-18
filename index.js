@@ -9,7 +9,7 @@ const gravity = 0.1
 class Player {
   constructor() {
     this.speed = 5
-    this.image = gamer
+    this.image = gamer //Problem
     this.position = {
       x: 100,
       y: 100
@@ -24,7 +24,12 @@ class Player {
         width:66
       },
       run:{
-        right:runRight,
+        right: runRight,
+        cropWidth: 340,
+        width:127.875
+      },
+      runLeft:{
+        left: runLeft,
         cropWidth: 340,
         width:127.875
       }
@@ -38,7 +43,7 @@ class Player {
   }
   //drawing the player
   draw() {
-    c.drawImage(this.image,
+    c.drawImage(this.currentSprite,
                 this.currentCropWidth* this.frames,
                 0,
                 this.currentCropWidth,
@@ -50,7 +55,9 @@ class Player {
     this.frames++
     if(this.frames > 59 && this.currentSprite=== this.sprite.stand.right){
       this.frames = 0
-    }else if(this.frames > 1 && this.currentSprite=== this.sprite.run.runRight){
+    }else if(this.frames > 27 && this.currentSprite=== this.sprite.run.right){
+      this.frames = 0
+    }else if(this.frames > 27 && this.currentSprite=== this.sprite.runLeft.left){
       this.frames = 0
     }
     this.draw()
@@ -100,7 +107,10 @@ let gamer= new Image()
 gamer.src='sprite/spriteStandRight.png'
 
 let runRight= new Image()
-runRight.src='spriteRunRight.png' 
+runRight.src='sprite/spriteRunRight.png' 
+
+let runLeft= new Image()
+runLeft.src='sprite/spriteRunLeft.png' 
 
 
 let image = new Image()
@@ -124,8 +134,11 @@ function init(){
   gamer= new Image()
   gamer.src='sprite/spriteStandRight.png'
 
-   runRight= new Image()
-   runRight.src='spriteRunRight.png'
+  runRight= new Image()
+  runRight.src='sprite/spriteRunRight.png'
+
+   runLeft= new Image()
+  runLeft.src='sprite/spriteRunLeft.png' 
   
  image = new Image()
 image.src = 'sprite/platform.png'
@@ -144,6 +157,24 @@ smallplat.src= 'sprite/platformSmallTall.png'
  player = new Player({image:gamer})
  platforms = [new Platform({ x: image.width*7+450, y: 200, image: smallplat }),new Platform({ x: 0, y: 460, image: image}), new Platform({ x: image.width-2, y: 460, image: image }),
   new Platform({ x: image.width*2+100, y: 460, image: image }),new Platform({ x: image.width*3+300, y: 460, image: image }),new Platform({ x: image.width*4+500, y: 460, image: image }),new Platform({ x: image.width*5+400, y: 460, image: image }),new Platform({ x: image.width*6+200, y: 460, image: image }),new Platform({ x: image.width*7+1100, y: 460, image: image }),new Platform({ x: image.width*8+1100, y: 460, image: image })]
+   // Create a base platform where new platforms will appear after
+  const basePlatform = new Platform({ x: image.width * 8 + 1100, y: 460, image: image });
+  platforms.push(basePlatform);
+
+  // Generate random standTallPlatforms after the base platform
+  const maxPlatforms = 14; // You can adjust the number of random platforms
+  let previousX = basePlatform.position.x;
+  for (let i = 0; i < maxPlatforms; i++) {
+    const randomX = previousX + basePlatform.width + Math.random() * 300; // Adjust the spacing between platforms
+    const randomY = Math.random() * (canvas.height - smallplat.height);
+
+    // Make sure the platform stays within canvas height
+    const yPosition = Math.min(randomY, canvas.height - smallplat.height);
+
+    platforms.push(new Platform({ x: randomX, y: yPosition, image: smallplat }));
+    previousX = randomX;
+  }
+  console.log(player.position.x)
 }
 const keys = {
   right: {
@@ -203,8 +234,9 @@ function animate() {
     }
   })
 //win condition
-  if(scrollOffset > image.width*8+800) {
+  if(scrollOffset > 11643) {
     //alert("You win");
+
     console.log("You win")
   }
   //lose condition
@@ -220,6 +252,9 @@ window.addEventListener('keydown', ({ keyCode }) => {
     case 65://a
       console.log("this is left")
       keys.left.pressed = true
+      player.currentSprite = player.sprite.runLeft.left
+      player.currentCropWidth = player.sprite.runLeft.cropWidth
+      player.width = player.sprite.runLeft.width
       break
     case 83://s
       console.log("this is dows")
@@ -227,7 +262,7 @@ window.addEventListener('keydown', ({ keyCode }) => {
     case 68://d
       console.log("this is right")
       keys.right.pressed = true
-      player.currentSprite = player.sprite.run.runRight
+      player.currentSprite = player.sprite.run.right
       player.currentCropWidth = player.sprite.run.cropWidth
       player.width = player.sprite.run.width
       break
@@ -242,6 +277,9 @@ window.addEventListener('keyup', ({ keyCode }) => {
     case 65://a
       console.log("this is left")
       keys.left.pressed = false
+      player.currentSprite = player.sprite.stand.right
+      player.currentCropWidth = player.sprite.stand.cropWidth
+      player.width = player.sprite.stand.width
       break
     case 83://s
       console.log("this is dows")
@@ -249,6 +287,9 @@ window.addEventListener('keyup', ({ keyCode }) => {
     case 68://d
       console.log("this is right")
       keys.right.pressed = false
+      player.currentSprite = player.sprite.stand.right
+      player.currentCropWidth = player.sprite.stand.cropWidth
+      player.width = player.sprite.stand.width
       break
     case 87://w
       console.log("this is up")

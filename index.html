@@ -1,11 +1,20 @@
 <style>
-  body{
+  body {
     margin: 0;
     background-color: black;
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
+  }
+
+  canvas {
+    width: 100%;
+    max-width: 1920px; /* 16:9 aspect ratio width */
+    height: auto;
+    max-height: 1080px; /* 16:9 aspect ratio height */
+    border: 10px solid black; /* Adds a smaller black border around the canvas */
+    box-sizing: border-box; /* Include border in width and height calculations */
   }
 </style>
 
